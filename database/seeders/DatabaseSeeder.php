@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Recipe;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -13,11 +14,24 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        $users = User::factory(5)->create();
+
+        foreach ($users as $user) {
+            $recipe = Recipe::factory()->for($user)->create();
+
+            foreach ($users as $rater) {
+                if ($rater->isNot($user)) {
+                    $recipe->ratings()->create(
+                        [
+                            'user_id' => $rater->id,
+                            'rating' => rand(1, 5),
+                        ]
+                    );
+                }
+            }
+        }
+
+
     }
 }
