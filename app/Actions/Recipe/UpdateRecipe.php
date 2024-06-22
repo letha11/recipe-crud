@@ -2,16 +2,15 @@
 
 namespace App\Actions\Recipe;
 
-use App\Http\Resources\RecipeResource;
 use App\Models\Recipe;
+use App\Traits\JsonResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class UpdateRecipe
 {
-    use AsAction;
+    use AsAction, JsonResponseTrait;
 
     public function handle(int $id, array $data)
     {
@@ -24,15 +23,17 @@ class UpdateRecipe
 
     public function asController(Request $request): JsonResponse
     {
-        $recipe = $this->handle(
-            $request->id,
-            $request->all(),
-        );
+        try {
+            $recipe = $this->handle(
+                $request->id,
+                $request->all(),
+            );
 
-        return response()->json([
-            'error' => false,
-            'message' => 'Recipe updated successfully',
-        ]);
+            return $this->success('Recipe updated successfully');
+        } catch (\Throwable $e) {
+            logger($e);
+            return $this->failed('Failed to update recipe', errors: $e->getMessage());
+        }
     }
 
     public function rules(): array

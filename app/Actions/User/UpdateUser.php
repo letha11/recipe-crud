@@ -2,15 +2,15 @@
 
 namespace App\Actions\User;
 
-use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Traits\JsonResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class UpdateUser
 {
-    use AsAction;
+    use AsAction, JsonResponseTrait;
 
     public function handle(int $id, array $data): bool
     {
@@ -20,12 +20,14 @@ class UpdateUser
 
     public function asController(int $id, Request $request): JsonResponse
     {
-        $this->handle($id, $request->all());
+        try {
+            $this->handle($id, $request->all());
 
-        return response()->json([
-            'error' => false,
-            'message' => 'User updated successfully',
-        ]);
+            return $this->success('User updated successfully');
+        } catch(\Exception $e) {
+            logger($e);
+            return $this->failed('Failed to update user', errors: $e->getMessage());
+        }
     }
 
     public function rules(): array

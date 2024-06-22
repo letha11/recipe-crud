@@ -3,15 +3,15 @@
 namespace App\Actions\Recipe;
 
 use App\Http\Resources\RecipeResource;
-use App\Models\Recipe;
 use App\Models\User;
+use App\Traits\JsonResponseTrait;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class CreateNewRecipe
 {
-    use AsAction;
+    use AsAction, JsonResponseTrait;
 
     public function handle(String $title, String $description, String $ingredients, String $instructions, Int $prep_time)
     {
@@ -21,21 +21,22 @@ class CreateNewRecipe
         );
     }
 
-    public function asController(Request $request): JsonResponse
+    public function asController(ActionRequest $request): JsonResponse
     {
-        $recipe = $this->handle(
-            $request->input('title'),
-            $request->input('description'),
-            $request->input('ingredients'),
-            $request->input('instructions'),
-            $request->input('prep_time')
-        );
+        try {
+            $recipe = $this->handle(
+                $request->input('title'),
+                $request->input('description'),
+                $request->input('ingredients'),
+                $request->input('instructions'),
+                $request->input('prep_time')
+            );
 
-        return response()->json([
-            'error' => false,
-            'message' => 'Recipe created successfully',
-            'recipe' => new RecipeResource($recipe),
-        ], 201);
+            return $this->success('Recipe created successfully', new RecipeResource($recipe), 201);
+        } catch (\Exception $e) {
+            logger($e);
+            return $this->failed('Failed to create recipe', errors: $e->getMessage());
+        }
     }
 
     public function rules(): array

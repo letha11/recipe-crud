@@ -3,7 +3,7 @@
 namespace App\Actions\Recipe;
 
 use App\Models\Recipe;
-use HttpException;
+use App\Traits\JsonResponseTrait;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -12,27 +12,25 @@ use Throwable;
 
 class DestroyRecipe
 {
-    use AsAction;
+    use AsAction, JsonResponseTrait;
 
     public function handle(int $id): void
     {
-            $recipe = Recipe::findOrFail($id);
-            $recipe->deleteOrFail();
+        $recipe = Recipe::findOrFail($id);
+        $recipe->deleteOrFail();
     }
 
     public function asController(Request $request): JsonResponse
     {
         try {
             $this->handle($request->id);
-
-            $status = 204;
         } catch (ModelNotFoundException $e) {
-            throw new ModelNotFoundException("Recipe not found", 404);
+            return $this->failed('Recipe not found', 404, $e->getMessage());
         } catch (Throwable $e) {
             logger($e);
-            throw new HttpException("Failed to delete recipe", 500);
+            return $this->failed('Failed to delete recipe', errors: $e->getMessage());
         }
 
-        return response()->json(null, $status);
+        return $this->success(status_code: 204);
     }
 }

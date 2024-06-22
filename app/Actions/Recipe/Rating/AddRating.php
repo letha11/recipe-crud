@@ -3,13 +3,14 @@
 namespace App\Actions\Recipe\Rating;
 
 use App\Models\Recipe;
-use Illuminate\Http\Request;
+use App\Traits\JsonResponseTrait;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class AddRating
 {
-    use AsAction;
+    use AsAction, JsonResponseTrait;
 
     public function handle(int $id, int $rating)
     {
@@ -23,12 +24,14 @@ class AddRating
 
     public function asController(Request $request): JsonResponse
     {
-        $this->handle($request->id, $request->input('rating'));
+        try {
+            $this->handle($request->id, $request->input('rating'));
 
-        return response()->json([
-            'error' => false,
-            'message' => 'Rating added successfully',
-        ]);
+            return $this->success('Rating added successfully');
+        } catch (\Exception $e) {
+             logger($e);
+            return $this->failed('Failed to add recipe', errors: $e->getMessage());
+        }
     }
 
     public function rules(): array

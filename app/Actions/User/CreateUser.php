@@ -4,13 +4,14 @@ namespace App\Actions\User;
 
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Traits\JsonResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class CreateUser
 {
-    use AsAction;
+    use AsAction, JsonResponseTrait;
 
     public function handle(String $name, String $email, String $password)
     {
@@ -25,11 +26,7 @@ class CreateUser
             $request->input('password')
         );
 
-        return response()->json([
-            'error' => false,
-            'message' => 'User created successfully',
-            'data' => new UserResource($user),
-        ]);
+        return $this->success('User created successfully', new UserResource($user), 201);
     }
 
     public function rules(): array
