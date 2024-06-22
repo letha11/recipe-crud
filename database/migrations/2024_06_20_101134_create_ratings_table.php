@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Recipe::class)->constrained()->cascadeOnDelete();
+            $table->unique(['user_id', 'recipe_id']);
             $table->integer('rating');
             $table->timestamps();
         });
