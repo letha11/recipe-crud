@@ -2,17 +2,31 @@
 
 namespace App\Actions\User;
 
+use App\Http\Resources\UserResource;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Lorisleiva\Actions\Concerns\AsAction;
 
-class GetOneUser
+class GetUser
 {
     use AsAction;
 
-    public function handle(User $user)
+    public function handle(int $id): Model|Collection|Builder|array|null
     {
-        $response = $user->toArray();
-        $response['error'] = false;
+        return User::with('recipes')->findOrFail($id);
+    }
 
-        return response()->json($response);
+    public function asController(Request $request): JsonResponse
+    {
+        $user = $this->handle($request->id);
+
+        return response()->json([
+            'error' => false,
+            'data' => new UserResource($user),
+        ]);
     }
 }
