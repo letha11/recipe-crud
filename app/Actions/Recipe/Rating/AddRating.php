@@ -6,6 +6,7 @@ use App\Models\Recipe;
 use App\Traits\JsonResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class AddRating
@@ -17,7 +18,7 @@ class AddRating
         $recipe = Recipe::findOrFail($id);
 
         $recipe->ratings()->create([
-            'user_id' => $recipe->user_id, // FIXME This should be the authenticated user
+            'user_id' => Auth::user()->id,
             'rating' => $rating,
         ]);
     }

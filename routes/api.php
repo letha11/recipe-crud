@@ -1,5 +1,8 @@
 <?php
 
+use App\Actions\Auth\GetAuthenticatedUser;
+use App\Actions\Auth\Login;
+use App\Actions\Auth\Register;
 use App\Actions\Recipe\CreateNewRecipe;
 use App\Actions\Recipe\DestroyRecipe;
 use App\Actions\Recipe\GetAllRecipe;
@@ -16,19 +19,23 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('/users')->group(function () {
     Route::get('/', GetAllUser::class);
     Route::get('/{id}', GetUser::class);
-    Route::post('/', CreateUser::class);
-    Route::patch('/{id}', UpdateUser::class);
+//    Route::post('/', CreateUser::class);
+//    Route::patch('/{id}', UpdateUser::class);
 });
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::prefix('auth')->group(function() {
+    Route::post('/login', Login::class);
+    Route::post('/register', Register::class);
+    Route::get('/user', GetAuthenticatedUser::class)->middleware('auth');
+});
 
 Route::prefix('/recipes')->group(function () {
     Route::get('/', GetAllRecipe::class);
     Route::get('/{id}', GetRecipe::class);
-    Route::post('/', CreateNewRecipe::class);
-    Route::patch('/{id}', UpdateRecipe::class);
-    Route::delete('/{id}', DestroyRecipe::class);
-    Route::post('/{id}/rating', AddRating::class);
+    Route::middleware('auth')->group(function () {
+        Route::post('/', CreateNewRecipe::class);
+        Route::patch('/{id}', UpdateRecipe::class);
+        Route::delete('/{id}', DestroyRecipe::class);
+        Route::post('/{id}/rating', AddRating::class);
+    });
 });

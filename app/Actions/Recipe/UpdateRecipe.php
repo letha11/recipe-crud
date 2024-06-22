@@ -4,8 +4,10 @@ namespace App\Actions\Recipe;
 
 use App\Models\Recipe;
 use App\Traits\JsonResponseTrait;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class UpdateRecipe
@@ -14,9 +16,12 @@ class UpdateRecipe
 
     public function handle(int $id, array $data)
     {
-        // FIXME
-        // Auth and other stuff
+        $user = Auth::user();
         $recipe = Recipe::findOrFail($id);
+
+        if ($user->id !== $recipe->user_id) {
+            throw new AuthenticationException(); // FIXME
+        }
 
         return $recipe->updateOrFail($data);
     }
@@ -30,7 +35,7 @@ class UpdateRecipe
             );
 
             return $this->success('Recipe updated successfully');
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             logger($e);
             return $this->failed('Failed to update recipe', errors: $e->getMessage());
         }

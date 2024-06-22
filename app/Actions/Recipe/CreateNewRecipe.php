@@ -6,6 +6,7 @@ use App\Http\Resources\RecipeResource;
 use App\Models\User;
 use App\Traits\JsonResponseTrait;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -13,9 +14,9 @@ class CreateNewRecipe
 {
     use AsAction, JsonResponseTrait;
 
-    public function handle(String $title, String $description, String $ingredients, String $instructions, Int $prep_time)
+    public function handle(int $user_id, String $title, String $description, String $ingredients, String $instructions, Int $prep_time)
     {
-        $user = User::findOrFail(1);
+        $user = User::findOrFail($user_id);
         return $user->recipes()->create(
             compact('title', 'description', 'ingredients', 'instructions', 'prep_time')
         );
@@ -25,6 +26,7 @@ class CreateNewRecipe
     {
         try {
             $recipe = $this->handle(
+                Auth::user()->id,
                 $request->input('title'),
                 $request->input('description'),
                 $request->input('ingredients'),
