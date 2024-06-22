@@ -14,11 +14,16 @@ class DestroyRecipe
 {
     use AsAction;
 
-    public function handle(Request $request): JsonResponse
+    public function handle(int $id): void
+    {
+            $recipe = Recipe::findOrFail($id);
+            $recipe->deleteOrFail();
+    }
+
+    public function asController(Request $request): JsonResponse
     {
         try {
-            $recipe = Recipe::findOrFail($request->id);
-            $recipe->deleteOrFail();
+            $this->handle($request->id);
 
             $status = 204;
         } catch (ModelNotFoundException $e) {

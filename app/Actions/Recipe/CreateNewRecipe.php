@@ -13,11 +13,23 @@ class CreateNewRecipe
 {
     use AsAction;
 
-    public function handle(Request $request): JsonResponse
+    public function handle(String $title, String $description, String $ingredients, String $instructions, Int $prep_time)
     {
-        // FIXME
-        $user = User::find(1);
-        $recipe = $user->recipes()->create($request->all());
+        $user = User::findOrFail(1);
+        return $user->recipes()->create(
+            compact('title', 'description', 'ingredients', 'instructions', 'prep_time')
+        );
+    }
+
+    public function asController(Request $request): JsonResponse
+    {
+        $recipe = $this->handle(
+            $request->input('title'),
+            $request->input('description'),
+            $request->input('ingredients'),
+            $request->input('instructions'),
+            $request->input('prep_time')
+        );
 
         return response()->json([
             'error' => false,
