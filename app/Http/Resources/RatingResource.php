@@ -15,9 +15,9 @@ class RatingResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
             'rating' => $this->rating,
-            'user' => new UserResource($this->whenLoaded('user')),
+            'name' => $this->when($this->relationLoaded('user'), fn () => $this->user->name),
+//            'user' => new UserResource($this->whenLoaded('user')),
             'recipe' => new RecipeResource($this->whenLoaded('recipe')),
         ];
     }

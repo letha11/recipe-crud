@@ -22,7 +22,9 @@ class RecipeResource extends JsonResource
             'instructions' => $this->instructions,
             'prep_time' => $this->prep_time,
             'author' => new UserResource($this->user),
-            'ratings' => new RatingCollection($this->whenLoaded('ratings')),
+            'ratings' => $this->when($this->relationLoaded('ratings'), function () {
+                return RatingResource::collection($this->ratings->load('user'));
+            }),
             'average_rating' => $this->ratings->avg('rating'),
             'created_at' => $this->created_at,
         ];

@@ -4,6 +4,7 @@ use App\Actions\Recipe\CreateNewRecipe;
 use App\Actions\Recipe\DestroyRecipe;
 use App\Actions\Recipe\GetAllRecipe;
 use App\Actions\Recipe\GetRecipe;
+use App\Actions\Recipe\Rating\AddRating;
 use App\Actions\Recipe\UpdateRecipe;
 use App\Actions\User\CreateUser;
 use App\Actions\User\GetAllUser;
@@ -29,4 +30,5 @@ Route::prefix('/recipes')->group(function () {
     Route::post('/', CreateNewRecipe::class);
     Route::patch('/{id}', UpdateRecipe::class);
     Route::delete('/{id}', DestroyRecipe::class);
+    Route::post('/{id}/rating', AddRating::class);
 });
