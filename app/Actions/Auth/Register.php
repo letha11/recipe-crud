@@ -4,8 +4,8 @@ namespace App\Actions\Auth;
 
 use App\Models\User;
 use App\Traits\JsonResponseTrait;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\ActionRequest;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -15,9 +15,16 @@ class Register
 
     public function handle(string $name, string $username, string $email, string $password)
     {
-        $user = User::create(compact('name', 'username', 'email', 'password'));
+        try {
+            DB::beginTransaction();
+            $user = User::create(compact('name', 'username', 'email', 'password'));
 
-        return Auth::login($user);
+            DB::commit();
+            return Auth::login($user);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
     public function asController(ActionRequest $request)

@@ -3,6 +3,8 @@
 use App\Actions\Auth\GetAuthenticatedUser;
 use App\Actions\Auth\Login;
 use App\Actions\Auth\Register;
+use App\Actions\Auth\SendEmailVerification;
+use App\Actions\Auth\VerifyEmail;
 use App\Actions\Recipe\CreateNewRecipe;
 use App\Actions\Recipe\DestroyRecipe;
 use App\Actions\Recipe\GetAllRecipe;
@@ -23,10 +25,13 @@ Route::prefix('/users')->group(function () {
 //    Route::patch('/{id}', UpdateUser::class);
 });
 
-Route::prefix('auth')->group(function() {
-    Route::post('/login', Login::class);
+
+Route::prefix('auth')->group(function () {
+    Route::post('/login', Login::class)->name('login');
     Route::post('/register', Register::class);
+    Route::get('/verify/{id}/{hash}', VerifyEmail::class)->name('verification.verify');
     Route::get('/user', GetAuthenticatedUser::class)->middleware('auth');
+    Route::post('/verify/resend', SendEmailVerification::class)->middleware('auth');
 });
 
 Route::prefix('/recipes')->group(function () {
