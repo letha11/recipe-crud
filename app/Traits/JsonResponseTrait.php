@@ -15,7 +15,7 @@ trait JsonResponseTrait
     public function success($message = null, $data = null, int $status_code = Response::HTTP_OK, $headers = [], $options = 0): JsonResponse
     {
         $response_data = [
-            'status' => true,
+            'error' => false,
             'message' => $message,
             'data' => $data,
         ];
@@ -26,7 +26,7 @@ trait JsonResponseTrait
     public function successPaginate($message = null, $data = null, int $status_code = Response::HTTP_OK, $headers = [], $options = 0): JsonResponse
     {
         $response_data = [];
-        $response_data['status'] = true;
+        $response_data['error'] = false;
         $response_data['message'] = $message;
 
         $response_data = $response_data + $data;
@@ -37,7 +37,7 @@ trait JsonResponseTrait
     public function failed($message = null, int $status_code = Response::HTTP_INTERNAL_SERVER_ERROR, $errors = null, $headers = [], $options = 0): JsonResponse
     {
         $response_data = [
-            'status' => false,
+            'error' => true,
             'message' => $message,
             'errors' => $errors,
         ];
